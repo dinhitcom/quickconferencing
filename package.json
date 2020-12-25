@@ -1,0 +1,27 @@
+{
+  "name": "quickconferencing",
+  "version": "0.0.1",
+  "description": "A web conferencing app using WebRTC, Socket.io and Node.js.",
+  "main": "src/app.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  },
+  "scripts": {
+    "dev": "nodemon --watch \"src/\" --exec \"node src/app.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dinhitcom/quickconferencing"
+  },
+  "keywords": [
+    "webrtc",
+    "webconferencing"
+  ],
+  "author": "dinhit.com",
+  "license": "ISC"
+}
