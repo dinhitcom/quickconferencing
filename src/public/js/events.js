@@ -1,23 +1,6 @@
 import helpers from './helpers.js';
 
 window.addEventListener( 'load', () => {
-    document.getElementById( 'local' ).addEventListener( 'click', () => {
-        if ( !document.pictureInPictureElement ) {
-            document.getElementById( 'local' ).requestPictureInPicture()
-                .catch( error => {
-                    console.error( error );
-                } );
-        }
-
-        else {
-            document.exitPictureInPicture()
-                .catch( error => {
-                    console.error( error );
-                } );
-        }
-    } );
-
-
     document.getElementById( 'create-room' ).addEventListener( 'click', ( e ) => {
         e.preventDefault();
 

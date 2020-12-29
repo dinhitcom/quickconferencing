@@ -111,14 +111,18 @@ export default {
         return {
             iceServers: [
                 {
-                    urls: ["stun:eu-turn4.xirsys.com"]
-                },
+                    urls: [ "stun:ss-turn1.xirsys.com" ]
+                }, 
                 {
-                    username: "ml0jh0qMKZKd9P_9C0UIBY2G0nSQMCFBUXGlk6IXDJf8G2uiCymg9WwbEJTMwVeiAAAAAF2__hNSaW5vbGVl",
-                    credential: "4dd454a6-feee-11e9-b185-6adcafebbb45",
+                    username: "ka8Ejub330RYj_NjVl77sPHpBUUVHq5y_bD6BJ509XEWyxybYHpahz_KU6MCpphSAAAAAF_rK3tkaW5oaXQ=",
+                    credential: "a5e05c64-49d7-11eb-83a7-0242ac140004",
                     urls: [
-                        "turn:eu-turn4.xirsys.com:80?transport=udp",
-                        "turn:eu-turn4.xirsys.com:3478?transport=tcp"
+                        "turn:ss-turn1.xirsys.com:80?transport=udp",
+                        "turn:ss-turn1.xirsys.com:3478?transport=udp",
+                        "turn:ss-turn1.xirsys.com:80?transport=tcp",
+                        "turn:ss-turn1.xirsys.com:3478?transport=tcp",
+                        "turns:ss-turn1.xirsys.com:443?transport=tcp",
+                        "turns:ss-turn1.xirsys.com:5349?transport=tcp"
                     ]
                 }
             ]
@@ -136,8 +140,6 @@ export default {
             contentAlign = 'justify-content-start';
             senderName = data.sender;
             msgBg = '';
-
-            this.toggleChatNotificationBadge();
         }
 
         let infoDiv = document.createElement( 'div' );
@@ -157,35 +159,16 @@ export default {
 
         chatMsgDiv.appendChild( rowDiv );
 
-        /**
-         * Move focus to the newly added message but only if:
-         * 1. Page has focus
-         * 2. User has not moved scrollbar upward. This is to prevent moving the scroll position if user is reading previous messages.
-         */
         if ( this.pageHasFocus ) {
             rowDiv.scrollIntoView();
         }
     },
-
-
-    toggleChatNotificationBadge() {
-        if ( document.querySelector( '#chat-pane' ).classList.contains( 'chat-opened' ) ) {
-            document.querySelector( '#new-chat-notification' ).setAttribute( 'hidden', true );
-        }
-
-        else {
-            document.querySelector( '#new-chat-notification' ).removeAttribute( 'hidden' );
-        }
-    },
-
-
 
     replaceTrack( stream, recipientPeer ) {
         let sender = recipientPeer.getSenders ? recipientPeer.getSenders().find( s => s.track && s.track.kind === stream.kind ) : false;
 
         sender ? sender.replaceTrack( stream ) : '';
     },
-
 
 
     toggleShareIcons( share ) {
@@ -268,18 +251,20 @@ export default {
     adjustVideoElemSize() {
         let elem = document.getElementsByClassName( 'card' );
         let totalRemoteVideosDesktop = elem.length;
-        let newWidth = totalRemoteVideosDesktop <= 2 ? '50%' : (
-            totalRemoteVideosDesktop == 3 ? '33.33%' : (
-                totalRemoteVideosDesktop <= 8 ? '25%' : (
-                    totalRemoteVideosDesktop <= 15 ? '20%' : (
-                        totalRemoteVideosDesktop <= 18 ? '16%' : (
-                            totalRemoteVideosDesktop <= 23 ? '15%' : (
-                                totalRemoteVideosDesktop <= 32 ? '12%' : '10%'
+        let newWidth = totalRemoteVideosDesktop <= 1 ? '100%' : (
+            totalRemoteVideosDesktop == 2 ? '50%' : (
+                totalRemoteVideosDesktop == 3 ? '33.33%' : (
+                    totalRemoteVideosDesktop <= 8 ? '25%' : (
+                        totalRemoteVideosDesktop <= 15 ? '20%' : (
+                            totalRemoteVideosDesktop <= 18 ? '16%' : (
+                                totalRemoteVideosDesktop <= 23 ? '15%' : (
+                                    totalRemoteVideosDesktop <= 32 ? '12%' : '10%'
+                                )
                             )
                         )
                     )
-                )
-            )
+                )  
+            ) 
         );
 
 
@@ -299,20 +284,17 @@ export default {
             newVid.autoplay = true;
             newVid.className = 'remote-video';
 
-            //video controls elements
             let controlDiv = document.createElement( 'div' );
             controlDiv.className = 'remote-video-controls';
             controlDiv.innerHTML = `<i class="fa fa-microphone text-white pr-3 mute-remote-mic" title="Mute"></i>
                 <i class="fa fa-expand text-white expand-remote-video" title="Expand"></i>`;
 
-            //create a new div for card
             let cardDiv = document.createElement( 'div' );
             cardDiv.className = 'card card-sm';
             cardDiv.id = `demo-${ i }`;
             cardDiv.appendChild( newVid );
             cardDiv.appendChild( controlDiv );
 
-            //put div in main-section elem
             document.getElementById( 'videos' ).appendChild( cardDiv );
 
             this.adjustVideoElemSize();
