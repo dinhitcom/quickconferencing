@@ -39,7 +39,6 @@ window.addEventListener( 'load', () => {
                 room: room,
                 socketId: socketId
             } );
-            console.log('emit subscribe');
 
             socket.on( 'new user', ( data ) => {
                 socket.emit( 'newUserStart', { to: data.socketId, sender: socketId } );
@@ -91,6 +90,8 @@ window.addEventListener( 'load', () => {
 
             socket.on( 'chat', ( data ) => {
                 h.addChat( data, 'remote' );
+                console.log('remote chat called')
+                console.log(data)
             } );
         } );
 
@@ -107,18 +108,21 @@ window.addEventListener( 'load', () => {
         }
 
 
-        function sendMsg( msg ) {
+        function sendMsg(msg, isNoti) {
             let data = {
                 room: room,
                 msg: msg,
-                sender: username
+                sender: username,
+                isNoti: isNoti
             };
 
-            //emit chat message
-            socket.emit( 'chat', data );
-
-            //add localchat
+            socket.emit('chat', data);
+            // console.log('emit chat')
+             if (isNoti) {
+                 h.addChat(data, 'remote');
+             } else
             h.addChat( data, 'local' );
+            
         }
 
 
@@ -128,23 +132,23 @@ window.addEventListener( 'load', () => {
 
             if ( screen && screen.getTracks().length ) {
                 screen.getTracks().forEach( ( track ) => {
-                    pc[partnerName].addTrack( track, screen );//should trigger negotiationneeded event
+                    pc[partnerName].addTrack( track, screen );
                 } );
             }
 
             else if ( myStream ) {
                 myStream.getTracks().forEach( ( track ) => {
-                    pc[partnerName].addTrack( track, myStream );//should trigger negotiationneeded event
+                    pc[partnerName].addTrack( track, myStream );
                 } );
             }
 
             else {
                 h.getUserFullMedia().then( ( stream ) => {
-                    //save my stream
+                   
                     myStream = stream;
 
                     stream.getTracks().forEach( ( track ) => {
-                        pc[partnerName].addTrack( track, stream );//should trigger negotiationneeded event
+                        pc[partnerName].addTrack( track, stream );
                     } );
 
                     h.setLocalStream( stream );
@@ -155,7 +159,6 @@ window.addEventListener( 'load', () => {
 
 
 
-            //create offer
             if ( createOffer ) {
                 pc[partnerName].onnegotiationneeded = async () => {
                     let offer = await pc[partnerName].createOffer();
@@ -168,14 +171,12 @@ window.addEventListener( 'load', () => {
 
 
 
-            //send ice candidate to partnerNames
             pc[partnerName].onicecandidate = ( { candidate } ) => {
                 socket.emit( 'ice candidates', { candidate: candidate, to: partnerName, sender: socketId } );
             };
 
 
 
-            //add
             pc[partnerName].ontrack = ( e ) => {
                 let str = e.streams[0];
                 if ( document.getElementById( `${ partnerName }-video` ) ) {
@@ -183,27 +184,23 @@ window.addEventListener( 'load', () => {
                 }
 
                 else {
-                    //video elem
                     let newVid = document.createElement( 'video' );
                     newVid.id = `${ partnerName }-video`;
                     newVid.srcObject = str;
                     newVid.autoplay = true;
                     newVid.className = 'remote-video';
 
-                    //video controls elements
                     let controlDiv = document.createElement( 'div' );
                     controlDiv.className = 'remote-video-controls';
                     controlDiv.innerHTML = `<i class="fa fa-microphone text-white pr-3 mute-remote-mic" title="Mute"></i>
                         <i class="fa fa-expand text-white expand-remote-video" title="Expand"></i>`;
 
-                    //create a new div for card
                     let cardDiv = document.createElement( 'div' );
                     cardDiv.className = 'card card-sm';
                     cardDiv.id = partnerName;
                     cardDiv.appendChild( newVid );
                     cardDiv.appendChild( controlDiv );
 
-                    //put div in main-section elem
                     document.getElementById( 'videos' ).appendChild( cardDiv );
 
                     h.adjustVideoElemSize();
@@ -215,6 +212,7 @@ window.addEventListener( 'load', () => {
             pc[partnerName].onconnectionstatechange = ( d ) => {
                 switch ( pc[partnerName].iceConnectionState ) {
                     case 'disconnected':
+                        sendMsg(' disconnected.', true);
                     case 'failed':
                         h.closeVideo( partnerName );
                         break;
@@ -230,8 +228,8 @@ window.addEventListener( 'load', () => {
             pc[partnerName].onsignalingstatechange = ( d ) => {
                 switch ( pc[partnerName].signalingState ) {
                     case 'closed':
-                        console.log( "Signalling state is 'closed'" );
-                        h.closeVideo( partnerName );
+                        console.log("Signalling state is 'closed'");
+                        h.closeVideo(partnerName);
                         break;
                 }
             };
@@ -240,43 +238,31 @@ window.addEventListener( 'load', () => {
 
 
         function shareScreen() {
-            h.shareScreen().then( ( stream ) => {
-                h.toggleShareIcons( true );
-
-                //disable the video toggle btns while sharing screen. This is to ensure clicking on the btn does not interfere with the screen sharing
-                //It will be enabled was user stopped sharing screen
-                h.toggleVideoBtnDisabled( true );
-
-                //save my screen stream
+            h.shareScreen().then((stream) => {
+                h.toggleShareIcons(true);
+                h.toggleVideoBtnDisabled(true);
                 screen = stream;
-
-                //share the new stream with all partners
                 broadcastNewTracks( stream, 'video', false );
-
-                //When the stop sharing button shown by the browser is clicked
                 screen.getVideoTracks()[0].addEventListener( 'ended', () => {
                     stopSharingScreen();
                 } );
-            } ).catch( ( e ) => {
-                console.error( e );
+            } ).catch((e) => {
+                console.error(e);
             } );
         }
 
 
 
         function stopSharingScreen() {
-            //enable video toggle btn
             h.toggleVideoBtnDisabled( false );
-
             return new Promise( ( res, rej ) => {
                 screen.getTracks().length ? screen.getTracks().forEach( track => track.stop() ) : '';
-
                 res();
             } ).then( () => {
-                h.toggleShareIcons( false );
-                broadcastNewTracks( myStream, 'video' );
-            } ).catch( ( e ) => {
-                console.error( e );
+                h.toggleShareIcons(false);
+                broadcastNewTracks(myStream, 'video');
+            } ).catch((e) => {
+                console.error(e);
             } );
         }
 
@@ -342,12 +328,11 @@ window.addEventListener( 'load', () => {
         }
 
 
-        //Chat textarea
-        document.getElementById( 'chat-input' ).addEventListener( 'keypress', ( e ) => {
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
             if ( e.which === 13 && ( e.target.value.trim() ) ) {
                 e.preventDefault();
 
-                sendMsg( e.target.value );
+                sendMsg(e.target.value, false);
 
                 setTimeout( () => {
                     e.target.value = '';
@@ -356,7 +341,6 @@ window.addEventListener( 'load', () => {
         } );
 
 
-        //When the video icon is clicked
         document.getElementById( 'toggle-video' ).addEventListener( 'click', ( e ) => {
             e.preventDefault();
 

@@ -126,20 +126,24 @@
 
         
         <div class="container-fluid room-comm" hidden>
-            <div class="row">
+            <div class="row" id="content">
                 <div class="col-md-9 main" id='main-section'>                    
                     <div class="row mt-2" id='videos'></div>
                     <div class="row" id='local-video'>
-                        <video class="local-video mirror-mode" id='local' volume='0' autoplay playsinline muted></video>
+                        <div class="col-4">
+                            <video class="local-video mirror-mode" id='local' volume='0' autoplay playsinline muted></video>
+                        </div>
+                        <div class="col-8">
+                            <br>
+                            <p>Share this link to your partners: </p>
+                            <input type="text" class="form-control" name="room-link" id="room-link" onclick="this.focus();this.select();">
+                        </div>
                     </div>
                 </div>
-
                 <div class="col-md-3 chat-col d-print-none mb-2 bg-light chat-opened" id='chat-pane'>
                     <div class="row">
                     </div>
-
                     <div id='chat-messages'></div>
-
                     <div class="row">
                         <textarea id='chat-input' class="form-control rounded-0 chat-box border-info" rows='3' placeholder="Type here..."></textarea>
                     </div>

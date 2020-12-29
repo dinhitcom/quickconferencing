@@ -1,6 +1,7 @@
 
 #videos {
     height: 75%;
+    background-color: black;
 }
 
 #local-video {
@@ -9,6 +10,14 @@
 
 .card {
     height: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#main-section {
+    height: 98vh;
 }
 
 .chat-col{
@@ -116,6 +125,7 @@
     left: 0;
     position: fixed;
     width:15vw;
+   
 }
 
 

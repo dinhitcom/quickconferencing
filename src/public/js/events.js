@@ -1,6 +1,12 @@
 import helpers from './helpers.js';
 
 window.addEventListener( 'load', () => {
+    //console.log(window.location.href)
+    let roomLink = document.getElementById('room-link')
+    roomLink.value = window.location.href;
+    roomLink.focus();
+    roomLink.select();
+    
     document.getElementById( 'create-room' ).addEventListener( 'click', ( e ) => {
         e.preventDefault();
 
@@ -14,11 +20,9 @@ window.addEventListener( 'load', () => {
 
             let roomLink = `${ location.origin }?room=${ roomName.trim().replace( ' ', '_' ) }_${ helpers.generateRandomString() }`;
 
-            document.querySelector( '#room-created' ).innerHTML = `Room successfully created. Click <a href='${ roomLink }'>here</a> to enter room. 
-                Share the room link with your partners.`;
-
             document.querySelector( '#room-name' ).value = '';
             document.querySelector( '#your-name' ).value = '';
+            window.location.replace(roomLink);
         }
 
         else {
@@ -26,28 +30,28 @@ window.addEventListener( 'load', () => {
         }
     } );
 
-    document.getElementById( 'enter-room' ).addEventListener( 'click', ( e ) => {
+    document.getElementById('enter-room').addEventListener( 'click', ( e ) => {
         e.preventDefault();
 
-        let name = document.querySelector( '#username' ).value;
+        let name = document.querySelector('#username').value;
 
         if ( name ) {
-            document.querySelector( '#err-msg-username' ).innerHTML = "";
+            document.querySelector('#err-msg-username').innerHTML = "";
 
-            sessionStorage.setItem( 'username', name );
+            sessionStorage.setItem('username', name );
 
             location.reload();
         }
 
         else {
-            document.querySelector( '#err-msg-username' ).innerHTML = "Please input your name";
+            document.querySelector('#err-msg-username').innerHTML = "Please input your name";
         }
     } );
 
 
-    document.addEventListener( 'click', ( e ) => {
-        if ( e.target && e.target.classList.contains( 'expand-remote-video' ) ) {
-            helpers.maximiseStream( e );
+    document.addEventListener('click', (e) => {
+        if ( e.target && e.target.classList.contains('expand-remote-video') ) {
+            helpers.maximiseStream(e);
         }
 
         else if ( e.target && e.target.classList.contains( 'mute-remote-mic' ) ) {

@@ -130,24 +130,31 @@ export default {
     },
 
 
-    addChat( data, senderType ) {
+    addChat(data, senderType) {
         let chatMsgDiv = document.querySelector( '#chat-messages' );
         let contentAlign = 'justify-content-end';
         let senderName = 'You';
         let msgBg = 'bg-white';
-
-        if ( senderType === 'remote' ) {
+        if (senderType === 'remote') {
             contentAlign = 'justify-content-start';
             senderName = data.sender;
             msgBg = '';
+        } 
+        
+        if (data.isNoti) {
+            data.msg  = data.sender + data.msg;
+            senderName = 'System'
         }
-
         let infoDiv = document.createElement( 'div' );
         infoDiv.className = 'sender-info';
         infoDiv.innerHTML = `${ senderName } - ${ moment().format( 'Do MMMM, YYYY h:mm a' ) }`;
 
         let colDiv = document.createElement( 'div' );
         colDiv.className = `col-10 card chat-card msg ${ msgBg }`;
+        if (data.isNoti) {
+            colDiv.classList.add('font-weight-bold');
+            
+        }
         colDiv.innerHTML = xssFilters.inHTMLData( data.msg ).autoLink( { target: "_blank", rel: "nofollow"});
 
         let rowDiv = document.createElement( 'div' );

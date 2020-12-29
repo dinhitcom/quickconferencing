@@ -1,0 +1,7 @@
+let data = {
+                            room: room,
+                            msg: ` disconnected.`,
+                            sender: username,
+                            isNoti: true
+                        };
+                        socket.emit('chat', data);
